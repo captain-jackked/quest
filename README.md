@@ -1,2 +1,2 @@
 # noodlethon
-Solve small real-life problems
+Solve small real-life problems by noodling with python
