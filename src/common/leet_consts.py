@@ -16,3 +16,4 @@ ACC_DE_SKEWED = 'Acc (De-skewed)'
 ACC_NORMALIZED = 'Acc (Normalized)'
 
 SCORE = 'Score'
+SOLVED = 'Solved'

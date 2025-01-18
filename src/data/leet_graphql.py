@@ -30,8 +30,8 @@ def _get_graphql_query() -> dict:
 def _get_questions_as_df() -> pd.DataFrame:
     response = requests.post(f'{LEETCODE}/graphql', json=_get_graphql_query())
     df = pd.json_normalize(response.json()['data']['questionList']['questions'])
-    df['Index'] = pd.to_numeric(df['Index'])
-    return df.sort_values(by=['Index']).set_index('Index')
+    df[leet_consts.INDEX] = pd.to_numeric(df[leet_consts.INDEX])
+    return df.sort_values(by=[leet_consts.INDEX]).set_index(leet_consts.INDEX)
 
 
 def _get_hyperlink(title: str, slug: str) -> str:
@@ -58,7 +58,7 @@ def _flatten_dict_vals_list(tags_data: list[dict]) -> str:
 
 def _refine_tags(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=True)
-    df['Tags'] = [_flatten_dict_vals_list(x) for x in df['Tags']]
+    df[leet_consts.TAGS] = [_flatten_dict_vals_list(x) for x in df[leet_consts.TAGS]]
     return df
 
 
