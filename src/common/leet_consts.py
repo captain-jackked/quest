@@ -1,6 +1,6 @@
 INDEX = 'Index'
 TITLE = 'Title'
-LINK = 'Link'
+TITLE_SLUG = 'TitleSlug'
 PREMIUM = 'Premium'
 
 TAGS = 'Tags'
