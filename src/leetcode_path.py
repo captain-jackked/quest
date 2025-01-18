@@ -1,33 +1,36 @@
 import pandas as pd
 import requests
 
-query = {
-    "query": """
-        query problemsetQuestionList(
-            $categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput
-        ) {
-            problemsetQuestionList: questionList(
-                categorySlug: $categorySlug, limit: $limit, skip: $skip, filters: $filters
-            ) {
-                total: totalNum
-                questions: data {
-                    Acceptance: acRate
-                    Difficulty: difficulty
-                    Index: questionFrontendId
-                    Premium: isPaidOnly
-                    Title: title
-                    TitleSlug: titleSlug
-                    Tags: topicTags {slug}
+
+def _get_all_questions() -> pd.DataFrame:
+    def _flatten_dict_vals_list(data: list[dict]) -> list:
+        return list(sorted(set(y for x in data for y in x.values())))
+
+    query = {
+        'query': """
+            query($categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput) {
+                questionList(categorySlug: $categorySlug, limit: $limit, skip: $skip, filters: $filters) {
+                    questions: data {
+                        Index: questionFrontendId
+                        Title: title
+                        TitleSlug: titleSlug
+                        Difficulty: difficulty
+                        Acceptance: acRate
+                        Premium: isPaidOnly
+                        Tags: topicTags {slug}
+                    }
                 }
             }
-        }
-    """,
-    "variables": {"categorySlug": "", "skip": 0, "limit": 1e5, "filters": {}},
-}
+        """,
+        'variables': {'categorySlug': '', 'skip': 0, 'limit': 1e5, 'filters': {}},
+    }
 
-response = requests.post("https://leetcode.com/graphql", json=query)
-response = response.json()["data"]["problemsetQuestionList"]["questions"]
-questions = pd.json_normalize(response)[[
-    "Index", "Title", "TitleSlug", "Difficulty", "Acceptance", "Premium", "Tags",
-]]
-print("Done")
+    result = requests.post('https://leetcode.com/graphql', json=query)
+    result = pd.json_normalize(result.json()['data']['questionList']['questions'])
+    result['Tags'] = result['Tags'].apply(lambda x: _flatten_dict_vals_list(x))
+    return result
+
+
+if __name__ == '__main__':
+    questions = _get_all_questions()
+    print(questions)
