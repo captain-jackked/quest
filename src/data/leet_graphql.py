@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 
-from common import leet_consts
+from src.common import leet_consts
 
 LEETCODE = 'https://leetcode.com'
 

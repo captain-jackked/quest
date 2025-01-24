@@ -2,9 +2,9 @@ import typing
 
 import pandas as pd
 
-from common import leet_consts
-from data import leet_graphql
-from quant import metric_utils
+from src.common import leet_consts
+from src.data import leet_graphql
+from src.quant import metric_utils
 
 
 # TODO:

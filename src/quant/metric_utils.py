@@ -2,7 +2,7 @@ import typing
 
 import pandas as pd
 
-from common import leet_consts
+from src.common import leet_consts
 
 BASE_SCORES = {leet_consts.EASY: 1.0, leet_consts.MEDIUM: 2.0, leet_consts.HARD: 4.0}
 AVG_WINDOW = 500
