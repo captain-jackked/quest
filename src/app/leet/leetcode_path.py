@@ -3,7 +3,7 @@ import typing
 import pandas as pd
 
 from src.common import leet_consts
-from src.data import leet_graphql
+from src.data.graphql import leetcode
 from src.quant import metric_utils
 
 
@@ -12,7 +12,7 @@ from src.quant import metric_utils
 #   features: persist last state, record progress (bulk import, single entries, edit errors)
 
 def _get_all_problems() -> pd.DataFrame:
-    return metric_utils.append_leetcode_metrics(leet_graphql.get_all_questions())
+    return metric_utils.append_leetcode_metrics(leetcode.get_all_questions())
 
 
 def _get_solved_problems(filename: str) -> typing.Iterable:
@@ -23,9 +23,9 @@ def _get_solved_problems(filename: str) -> typing.Iterable:
 
 def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
     problems = problems.copy(deep=True)
-    problems[leet_consts.SOLVED] = False
+    problems[leet_consts.SOLVED] = ''
     for index in solved:
-        problems.at[index, leet_consts.SOLVED] = True
+        problems.at[index, leet_consts.SOLVED] = 1
     return problems
 
 
