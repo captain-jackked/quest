@@ -3,8 +3,8 @@ import typing
 import pandas as pd
 
 from src.common import leet_consts
-from src.data.graphql import leetcode
-from src.quant import metric_utils
+from src.data.graphql import leet_ql
+from src.quant import leet_utils
 
 
 # TODO:
@@ -12,7 +12,7 @@ from src.quant import metric_utils
 #   features: persist last state, record progress (bulk import, single entries, edit errors)
 
 def _get_all_problems() -> pd.DataFrame:
-    return metric_utils.append_leetcode_metrics(leetcode.get_all_questions())
+    return leet_utils.append_leetcode_metrics(leet_ql.get_all_questions())
 
 
 def _get_solved_problems(filename: str) -> typing.Iterable:

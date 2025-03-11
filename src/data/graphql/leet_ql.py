@@ -31,6 +31,7 @@ def _get_questions_as_df() -> pd.DataFrame:
     response = requests.post(f'{LEETCODE}/graphql', json=_get_graphql_query())
     df = pd.json_normalize(response.json()['data']['questionList']['questions'])
     df[leet_consts.INDEX] = pd.to_numeric(df[leet_consts.INDEX])
+    df[leet_consts.ACCEPTANCE] /= 100
     return df.sort_values(by=[leet_consts.INDEX]).set_index(leet_consts.INDEX)
 
 
