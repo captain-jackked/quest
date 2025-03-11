@@ -3,6 +3,7 @@ import typing
 import pandas as pd
 
 from src.common import leet_consts
+from src.data.filer import file_utils
 from src.data.graphql import leet_ql
 from src.quant import leet_utils
 
@@ -15,10 +16,8 @@ def _get_all_problems() -> pd.DataFrame:
     return leet_utils.append_leetcode_metrics(leet_ql.get_all_questions())
 
 
-def _get_solved_problems(filename: str) -> typing.Iterable:
-    with open(filename) as file:
-        res = file.read()
-    return [int(x) for x in res.split('\n')]
+def _get_solved_problems(file_name: str) -> typing.Iterable:
+    return [int(x) for x in file_utils.read_txt(file_name).split('\n')]
 
 
 def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
@@ -31,4 +30,4 @@ def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFr
 
 if __name__ == '__main__':
     df = _append_solved(_get_all_problems(), _get_solved_problems('Solved.txt'))
-    df.to_excel('Leet-Sheet.xlsx')
+    file_utils.write_sheet('Leet-Sheet.xlsx', df)

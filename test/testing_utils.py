@@ -13,7 +13,7 @@ def setup_test_files(gen_config: typing.Union[None, dict[str, typing.Callable]])
     def decorated(func: typing.Callable) -> typing.Callable:
         def simply_decorated(*args, **kwargs):
             for gen_name, gen_func in gen_config.items():
-                file_utils.write_sheet(gen_func(), gen_name)
+                file_utils.write_sheet(gen_name, gen_func())
             res = func(*args, **kwargs)
             for gen_name in gen_config.keys():
                 file_utils.delete_file(gen_name)
