@@ -19,9 +19,9 @@ def _get_solved_problems(file_name: str) -> typing.Iterable:
 
 def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
     problems = problems.copy(deep=True)
-    problems[leet_consts.SOLVED] = ''
+    problems[leet_consts.SOLVED] = False
     for index in solved:
-        problems.at[index, leet_consts.SOLVED] = 'Yes'
+        problems.at[index, leet_consts.SOLVED] = True
     return problems
 
 
@@ -32,31 +32,22 @@ def _dew_it() -> pd.DataFrame:
     return df
 
 
-def _get_count(df: pd.DataFrame, flt):
-    return len(df[flt])
-
-
-def _get_scores(df: pd.DataFrame, flt):
-    return sum(df[flt][leet_consts.OLD_SCORE])
-
-
 def _print_summary(df: pd.DataFrame):
-    solved_flt, premium_flt = df[leet_consts.SOLVED] != '', df[leet_consts.PREMIUM]
+    def _get_count(raw: pd.DataFrame, flt):
+        return len(raw[flt])
+
+    def _get_scores(raw: pd.DataFrame, flt):
+        return sum(raw[flt][leet_consts.OLD_SCORE])
+
+    solved_flt, premium_flt = df[leet_consts.SOLVED], df[leet_consts.PREMIUM]
     for difficulty in [leet_consts.EASY, leet_consts.MEDIUM, leet_consts.HARD]:
         diff_flt = df[leet_consts.DIFFICULTY] == difficulty
-        diff_probs, solved_diff, unsolved_diff_prem, unsolved_diff_non_prem = [_get_count(df, flt) for flt in (
-            diff_flt,
-            diff_flt & solved_flt,
-            diff_flt & ~solved_flt & ~premium_flt,
-            diff_flt & ~solved_flt & premium_flt
-        )]
-        print('{}: {}/{} (Solved/Total), Pending: {}/{} (Non-premium/Premium)'.format(
+        print('{}: {}/{} (Solved/Total), Unsolved: {}/{} (Non-premium/Premium)'.format(
             difficulty,
-            solved_diff, diff_probs,
-            unsolved_diff_non_prem, unsolved_diff_prem
+            _get_count(df, diff_flt & solved_flt), _get_count(df, diff_flt),
+            _get_count(df, diff_flt & ~solved_flt & ~premium_flt), _get_count(df, diff_flt & ~solved_flt & premium_flt)
         ))
-    all_probs, solved = (_get_scores(df, flt) for flt in ([True] * len(df.index), solved_flt))
-    print(f'Score: {solved:.1f}/{all_probs:.1f} (Solved/Total)')
+    print(f'Score: {_get_scores(df, solved_flt):.1f}/{_get_scores(df, [True] * len(df.index)):.1f} (Solved/Total)')
 
 
 if __name__ == '__main__':
