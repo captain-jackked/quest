@@ -79,9 +79,3 @@ class RampedUpScorer(LeetScorer):
     @classmethod
     def _get_score_multiplier(cls, modified_acc: float) -> float:
         return 1 + modified_acc
-
-
-def append_leetcode_metrics(df: pd.DataFrame) -> pd.DataFrame:
-    df[leet_consts.OLD_SCORE] = RampedUpScorer.eval(df)
-    df[leet_consts.SCORE] = WindowedScorer.eval(df)
-    return df

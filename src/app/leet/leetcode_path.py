@@ -5,7 +5,7 @@ import pandas as pd
 from src.common import leet_consts
 from src.data.filer import file_utils
 from src.data.graphql import leet_ql
-from src.quant import leet_utils
+from src.quant.leet_scorer import RampedUpScorer, WindowedScorer
 
 
 # TODO:
@@ -13,23 +13,15 @@ from src.quant import leet_utils
 #   features: persist last state, record progress (bulk import, single entries, edit errors)
 
 
+def _get_all_problems() -> pd.DataFrame:
+    df = leet_ql.get_all_questions()
+    df[leet_consts.OLD_SCORE] = RampedUpScorer.eval(df)
+    df[leet_consts.SCORE] = WindowedScorer.eval(df)
+    return df
+
+
 def _get_solved_problems(file_name: str) -> typing.Iterable:
     return [int(x) for x in file_utils.read_txt(file_name).split('\n')]
-
-
-def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
-    problems = problems.copy(deep=True)
-    problems[leet_consts.SOLVED] = False
-    for index in solved:
-        problems.at[index, leet_consts.SOLVED] = True
-    return problems
-
-
-def _dew_it() -> pd.DataFrame:
-    df = leet_ql.get_all_questions()
-    df = leet_utils.append_leetcode_metrics(df)
-    df = _append_solved(df, _get_solved_problems('Solved.txt'))
-    return df
 
 
 def _print_summary(df: pd.DataFrame):
@@ -50,7 +42,19 @@ def _print_summary(df: pd.DataFrame):
     print(f'Score: {_get_scores(df, solved_flt):.1f}/{_get_scores(df, [True] * len(df.index)):.1f} (Solved/Total)')
 
 
+def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
+    problems = problems.copy(deep=True)
+    problems[leet_consts.SOLVED] = False
+    for index in solved:
+        problems.at[index, leet_consts.SOLVED] = True
+    _print_summary(problems)
+    return problems
+
+
+def _dew_it(input_file, output_file):
+    res = _append_solved(_get_all_problems(), _get_solved_problems(input_file))
+    file_utils.write_sheet(output_file, res)
+
+
 if __name__ == '__main__':
-    res = _dew_it()
-    _print_summary(res)
-    file_utils.write_sheet('Leet-Sheet.xlsx', res)
+    _dew_it('Solved.txt', 'Leet-Sheet.xlsx')
