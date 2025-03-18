@@ -5,7 +5,7 @@ import pandas as pd
 from src.common import leet_consts
 from src.data.filer import file_utils
 from src.data.graphql import leet_ql
-from src.quant.leet_scorer import RampedUpScorer, WindowedScorer
+from src.quant.leet_scorer import RejectionScorer, WindowedScorer
 
 
 # TODO:
@@ -15,7 +15,7 @@ from src.quant.leet_scorer import RampedUpScorer, WindowedScorer
 
 def _get_all_problems() -> pd.DataFrame:
     df = leet_ql.get_all_questions()
-    df[leet_consts.OLD_SCORE] = RampedUpScorer.eval(df)
+    df[leet_consts.OLD_SCORE] = RejectionScorer.eval(df)
     df[leet_consts.SCORE] = WindowedScorer.eval(df)
     return df
 
@@ -47,6 +47,7 @@ def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFr
     problems[leet_consts.SOLVED] = False
     for index in solved:
         problems.at[index, leet_consts.SOLVED] = True
+    problems = problems[leet_consts.OUTPUT_COLS]
     _print_summary(problems)
     return problems
 

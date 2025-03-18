@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import numpy as np
 import pandas as pd
 
 from src.common import leet_consts
@@ -8,6 +9,18 @@ from src.common import leet_consts
 class LeetScorer(ABC):
     MODIFIED_ACC = 'Modified Acceptance'
     BASE_SCORES = {leet_consts.EASY: 1.0, leet_consts.MEDIUM: 2.0, leet_consts.HARD: 3.0}
+
+    WINDOW = 1200
+    RAMP_END = WINDOW
+    SLOPE = 44 / 3e5
+
+    @classmethod
+    def _window_avg(cls, values: pd.Series, window: int):
+        return values.rolling(window=window, min_periods=0, center=True).mean()
+
+    @classmethod
+    def _linear_offset(cls, seed_values: pd.Series, limit: int, slope: float):
+        return np.minimum(seed_values, limit) * slope
 
     @classmethod
     @abstractmethod
@@ -39,14 +52,12 @@ class LeetScorer(ABC):
 
 
 class WindowedScorer(LeetScorer):
-    WINDOW = 1000
     DECAY_RATE = 2
     DECAY_FLOOR = 0.5
 
     @classmethod
     def _append_modified_acc(cls, df: pd.DataFrame):
-        rolling_average_acc = df.rolling(window=cls.WINDOW, min_periods=0, center=True)[leet_consts.ACCEPTANCE].mean()
-        df[cls.MODIFIED_ACC] = df[leet_consts.ACCEPTANCE] - rolling_average_acc
+        df[cls.MODIFIED_ACC] = df[leet_consts.ACCEPTANCE] - cls._window_avg(df[leet_consts.ACCEPTANCE], cls.WINDOW)
         ans = []
         for diff in cls.BASE_SCORES.keys():
             df_diff = df[df[leet_consts.DIFFICULTY] == diff]
@@ -60,20 +71,16 @@ class WindowedScorer(LeetScorer):
         return decay_factor if modified_acc >= 0 else 1 / decay_factor
 
 
-class RampedUpScorer(LeetScorer):
-    RAMP_END = 1200
-    SLOPE = 44 / 3e5
-
+class RejectionScorer(LeetScorer):
     @classmethod
     def _append_modified_acc(cls, df: pd.DataFrame):
-        df[cls.MODIFIED_ACC] = df.index
-        df.loc[df[cls.MODIFIED_ACC] > 1200, cls.MODIFIED_ACC] = 1200
-        df[cls.MODIFIED_ACC] = df[leet_consts.ACCEPTANCE] - df[cls.MODIFIED_ACC] * cls.SLOPE
+        df[cls.MODIFIED_ACC] = df[leet_consts.ACCEPTANCE] - cls._linear_offset(df.index, cls.RAMP_END, cls.SLOPE)
+        # df[cls.MODIFIED_ACC] = df[leet_consts.ACCEPTANCE] - cls._window_avg(df[leet_consts.ACCEPTANCE], cls.WINDOW)
         ans = []
         for diff in cls.BASE_SCORES.keys():
             df_diff = df[df[leet_consts.DIFFICULTY] == diff]
             avg_acc = df_diff[cls.MODIFIED_ACC].mean()
-            ans.append((avg_acc - df_diff[cls.MODIFIED_ACC]) / (1 - avg_acc))
+            ans.append((avg_acc - df_diff[cls.MODIFIED_ACC]) / (1 - avg_acc))  # (rejection - avg_rej) / avg rej
         df[cls.MODIFIED_ACC] = pd.concat(ans).squeeze()
 
     @classmethod
