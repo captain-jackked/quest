@@ -5,7 +5,7 @@ import pandas as pd
 from src.common import leet_consts
 from src.data.filer import file_utils
 from src.data.graphql import leet_ql
-from src.quant.leet_scorer import RejectionScorer, WindowedScorer
+from src.quant import leet_scorer
 
 
 # TODO:
@@ -15,8 +15,7 @@ from src.quant.leet_scorer import RejectionScorer, WindowedScorer
 
 def _get_all_problems() -> pd.DataFrame:
     df = leet_ql.get_all_questions()
-    df[leet_consts.OLD_SCORE] = RejectionScorer.eval(df)
-    df[leet_consts.SCORE] = WindowedScorer.eval(df)
+    df[leet_consts.SCORE] = leet_scorer.evaluate(df)
     return df
 
 
@@ -29,17 +28,19 @@ def _print_summary(df: pd.DataFrame):
         return len(raw[flt])
 
     def _get_scores(raw: pd.DataFrame, flt):
-        return sum(raw[flt][leet_consts.OLD_SCORE])
+        return sum(raw[flt][leet_consts.SCORE])
 
     solved_flt, premium_flt = df[leet_consts.SOLVED], df[leet_consts.PREMIUM]
     for difficulty in [leet_consts.EASY, leet_consts.MEDIUM, leet_consts.HARD]:
         diff_flt = df[leet_consts.DIFFICULTY] == difficulty
-        print('{}: {}/{} (Solved/Total), Unsolved: {}/{} (Non-premium/Premium)'.format(
+        print('{:>7}: {:>7}/{:<4} (Solved/Total) | Unsolved: {:>4}/{:<4} (Non-premium/Premium)'.format(
             difficulty,
             _get_count(df, diff_flt & solved_flt), _get_count(df, diff_flt),
             _get_count(df, diff_flt & ~solved_flt & ~premium_flt), _get_count(df, diff_flt & ~solved_flt & premium_flt)
         ))
-    print(f'Score: {_get_scores(df, solved_flt):.1f}/{_get_scores(df, [True] * len(df.index)):.1f} (Solved/Total)')
+    print('{:>7}: {:>7.1f}/{:.0f} (Solved/Total)'.format(
+        'Score', _get_scores(df, solved_flt), _get_scores(df, [True] * len(df.index))
+    ))
 
 
 def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
