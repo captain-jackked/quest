@@ -6,17 +6,23 @@ from src.common import leet_consts
 MODIFIED_ACC = 'Modified Acceptance'
 BASE_SCORES = {leet_consts.EASY: 1.0, leet_consts.MEDIUM: 2.0, leet_consts.HARD: 3.0}
 
-RAMP_END = 1200
-SLOPE = 44 / 3e5
 
+def _get_adjustment(acc: pd.Series) -> pd.Series:
+    def _get_slope(x, y) -> float:
+        m, _ = np.polyfit(x, y, 1)
+        return m
 
-def _linear_offset(seed_values: pd.Series, limit: int, slope: float):
-    # TODO: remove hard-coding of the adjustment OR remove adjustment
-    return np.minimum(seed_values, limit) * slope
+    indices, values, pivot = acc.keys().values, acc.values, len(acc) // 2
+    left_slope, right_slope = _get_slope(indices[:pivot], values[:pivot]), _get_slope(indices[pivot:], values[pivot:])
+    # adj_values = [(pivot - i) * (left_slope if i < pivot else right_slope) for i in indices]  # pull up
+    adj_values = [-(min(i, pivot) - 1) * left_slope + (max(0, i - pivot)) * (-right_slope) for i in
+                  indices]  # push down
+    return pd.Series(data=adj_values, index=indices)
 
 
 def _append_modified_acc(df: pd.DataFrame):
-    df[MODIFIED_ACC] = df[leet_consts.ACCEPTANCE] - _linear_offset(df.index, RAMP_END, SLOPE)
+    df[MODIFIED_ACC] = df[leet_consts.ACCEPTANCE] + _get_adjustment(df[leet_consts.ACCEPTANCE])
+    df[MODIFIED_ACC] = np.maximum(np.minimum(df[MODIFIED_ACC], 0.99), 0.01)
     ans = []
     for diff in BASE_SCORES.keys():
         df_diff = df[df[leet_consts.DIFFICULTY] == diff]
