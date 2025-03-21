@@ -23,7 +23,16 @@ def _get_solved_problems(file_name: str) -> typing.Iterable:
     return [int(x) for x in file_utils.read_txt(file_name).split('\n')]
 
 
-def _print_summary(df: pd.DataFrame):
+def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
+    problems = problems.copy(deep=True)
+    problems[leet_consts.SOLVED] = False
+    for index in solved:
+        problems.at[index, leet_consts.SOLVED] = True
+    problems = problems[leet_consts.OUTPUT_COLS]
+    return problems
+
+
+def _print_progress_summary(df: pd.DataFrame):
     def _get_count(raw: pd.DataFrame, flt):
         return len(raw[flt])
 
@@ -41,22 +50,43 @@ def _print_summary(df: pd.DataFrame):
     print('{:>7}: {:>7.1f}/{:.0f} (Solved/Total)'.format(
         'Score', _get_scores(df, solved_flt), _get_scores(df, [True] * len(df.index))
     ))
+    print('-' * 80)
 
 
-def _append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFrame:
-    problems = problems.copy(deep=True)
-    problems[leet_consts.SOLVED] = False
-    for index in solved:
-        problems.at[index, leet_consts.SOLVED] = True
-    problems = problems[leet_consts.OUTPUT_COLS]
-    _print_summary(problems)
-    return problems
+def _get_low_hanging_fruit(full_report: pd.DataFrame):
+    def _filter_problems(df: pd.DataFrame, flts) -> pd.DataFrame:
+        res = df.copy(deep=True)
+        for k, (flip, v) in flts.items():
+            if not isinstance(v, typing.Iterable):
+                v = [v]
+            has_na, unique = False, set()
+            for x in v:
+                if x is None:
+                    has_na = True
+                else:
+                    unique.add(x)
+            flt = res[k].isin(unique)
+            if has_na:
+                flt = flt | res[k].isna()
+            if flip:
+                flt = ~flt
+            res = res[flt]
+        return res
+
+    filters = {
+        leet_consts.SOLVED: (False, False),
+        leet_consts.PREMIUM: (False, False),
+        leet_consts.TAGS: (True, ['NA', 'shell'])
+    }
+    return _filter_problems(full_report, filters).sort_values(by=[leet_consts.SCORE])
 
 
-def _dew_it(input_file, output_file):
+def _dew_it(input_file, report_file, recommendation_file):
     res = _append_solved(_get_all_problems(), _get_solved_problems(input_file))
-    file_utils.write_sheet(output_file, res)
+    file_utils.write_sheet(report_file, res)
+    _print_progress_summary(res)
+    file_utils.write_sheet(recommendation_file, _get_low_hanging_fruit(res))
 
 
 if __name__ == '__main__':
-    _dew_it('Solved.txt', 'Leet-Sheet.xlsx')
+    _dew_it('Solved.txt', 'Leet-Sheet.xlsx', 'Leet-Path.xlsx')
