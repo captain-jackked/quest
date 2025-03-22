@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 
-from src.common import leet_consts
+from src.leet_path.helper import consts
 
 LEETCODE = 'https://leetcode.com'
 
@@ -30,9 +30,9 @@ def _get_graphql_query() -> dict:
 def _get_questions_as_df() -> pd.DataFrame:
     response = requests.post(f'{LEETCODE}/graphql', json=_get_graphql_query())
     df = pd.json_normalize(response.json()['data']['questionList']['questions'])
-    df[leet_consts.INDEX] = pd.to_numeric(df[leet_consts.INDEX])
-    df[leet_consts.ACCEPTANCE] /= 100
-    return df.sort_values(by=[leet_consts.INDEX]).set_index(leet_consts.INDEX)
+    df[consts.INDEX] = pd.to_numeric(df[consts.INDEX])
+    df[consts.ACCEPTANCE] /= 100
+    return df.sort_values(by=[consts.INDEX]).set_index(consts.INDEX)
 
 
 def _get_hyperlink(title: str, slug: str) -> str:
@@ -41,10 +41,10 @@ def _get_hyperlink(title: str, slug: str) -> str:
 
 def _overload_title(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=True)
-    df[leet_consts.TITLE] = [_get_hyperlink(title, slug) for title, slug in zip(
-        df[leet_consts.TITLE], df[leet_consts.TITLE_SLUG]
+    df[consts.TITLE] = [_get_hyperlink(title, slug) for title, slug in zip(
+        df[consts.TITLE], df[consts.TITLE_SLUG]
     )]
-    return df.drop(columns=[leet_consts.TITLE_SLUG])
+    return df.drop(columns=[consts.TITLE_SLUG])
 
 
 def _flatten_dict_vals_list(tags_data: list[dict]) -> str:
@@ -59,7 +59,7 @@ def _flatten_dict_vals_list(tags_data: list[dict]) -> str:
 
 def _refine_tags(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=True)
-    df[leet_consts.TAGS] = [_flatten_dict_vals_list(x) for x in df[leet_consts.TAGS]]
+    df[consts.TAGS] = [_flatten_dict_vals_list(x) for x in df[consts.TAGS]]
     return df
 
 

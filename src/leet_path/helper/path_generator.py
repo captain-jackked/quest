@@ -2,6 +2,8 @@ import typing
 
 import pandas as pd
 
+from src.leet_path.helper import consts
+
 
 class TableFilter:
     @staticmethod
@@ -25,3 +27,11 @@ class TableFilter:
 
     def apply(self, df: pd.DataFrame):
         return df[self._get_flt(df)]
+
+
+
+def get_low_hanging_fruit(report: pd.DataFrame):
+    report = TableFilter(consts.SOLVED, False).apply(report)
+    report = TableFilter(consts.PREMIUM, False).apply(report)
+    report = TableFilter(consts.TAGS, ['NA', 'shell'], flip=True).apply(report)
+    return report.sort_values(by=[consts.SCORE])
