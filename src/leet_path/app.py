@@ -1,6 +1,8 @@
+import socket
 import typing
 
 import pandas as pd
+from dash import Dash, dash_table
 
 from src.data.filer import file_utils
 from src.data.graphql import leet_ql
@@ -33,7 +35,11 @@ def _dew_it(input_file, problems_file, report_file, todo_file):
 
     res = path_generator.get_low_hanging_fruit(res)
     file_utils.write_sheet(todo_file, res)
+    return res
 
 
 if __name__ == '__main__':
-    _dew_it('0. Solved.txt', '1. LeetCode.xlsx', '2. LeetReport.xlsx', '3. LeetPath.xlsx')
+    app = Dash()
+    todo_df = _dew_it('0. Solved.txt', '1. LeetCode.xlsx', '2. LeetReport.xlsx', '3. LeetPath.xlsx').reset_index()
+    app.layout = dash_table.DataTable(todo_df.to_dict('records'), [{"name": i, "id": i} for i in todo_df.columns])
+    app.run(host=socket.gethostbyname(socket.gethostname()), port=9000)
