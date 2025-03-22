@@ -3,6 +3,7 @@ import typing
 import pandas as pd
 
 from src.common import leet_consts
+from src.common.table_filter import TableFilter
 from src.data.filer import file_utils
 from src.data.graphql import leet_ql
 from src.quant import leet_scorer
@@ -53,40 +54,25 @@ def _print_progress_summary(df: pd.DataFrame):
     print('-' * 80)
 
 
-def _get_low_hanging_fruit(full_report: pd.DataFrame):
-    def _filter_problems(df: pd.DataFrame, flts) -> pd.DataFrame:
-        res = df.copy(deep=True)
-        for k, (flip, v) in flts.items():
-            if not isinstance(v, typing.Iterable):
-                v = [v]
-            has_na, unique = False, set()
-            for x in v:
-                if x is None:
-                    has_na = True
-                else:
-                    unique.add(x)
-            flt = res[k].isin(unique)
-            if has_na:
-                flt = flt | res[k].isna()
-            if flip:
-                flt = ~flt
-            res = res[flt]
-        return res
+def _get_low_hanging_fruit(report: pd.DataFrame):
+    _print_progress_summary(report)
 
-    filters = {
-        leet_consts.SOLVED: (False, False),
-        leet_consts.PREMIUM: (False, False),
-        leet_consts.TAGS: (True, ['NA', 'shell'])
-    }
-    return _filter_problems(full_report, filters).sort_values(by=[leet_consts.SCORE])
+    report = TableFilter(leet_consts.SOLVED, False).apply(report)
+    report = TableFilter(leet_consts.PREMIUM, False).apply(report)
+    report = TableFilter(leet_consts.TAGS, ['NA', 'shell'], flip=True).apply(report)
+    return report.sort_values(by=[leet_consts.SCORE])
 
 
-def _dew_it(input_file, report_file, recommendation_file):
-    res = _append_solved(_get_all_problems(), _get_solved_problems(input_file))
+def _dew_it(input_file, problems_file, report_file, todo_file):
+    res = _get_all_problems()
+    file_utils.write_sheet(problems_file, res)
+
+    res = _append_solved(res, _get_solved_problems(input_file))
     file_utils.write_sheet(report_file, res)
-    _print_progress_summary(res)
-    file_utils.write_sheet(recommendation_file, _get_low_hanging_fruit(res))
+
+    res = _get_low_hanging_fruit(res)
+    file_utils.write_sheet(todo_file, res)
 
 
 if __name__ == '__main__':
-    _dew_it('Solved.txt', 'Leet-Sheet.xlsx', 'Leet-Path.xlsx')
+    _dew_it('0. Solved.txt', '1. LeetCode.xlsx', '2. LeetReport.xlsx', '3. LeetPath.xlsx')
