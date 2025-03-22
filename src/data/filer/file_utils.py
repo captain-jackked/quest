@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.common.config import DEFAULT_FILER
+DEFAULT_FILER = 'dump/'
 
 
 def use_path(fn):
