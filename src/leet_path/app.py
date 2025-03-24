@@ -9,9 +9,13 @@ from src.data.graphql import leet_ql
 from src.leet_path.helper import score_utils, path_utils, report_utils, consts, ui_utils
 
 
-# TODO:
-#   checks: lint, test coverage
-#   features: persist last state, record progress (bulk import, single entries, edit errors)
+# TODO: Generic
+#   pipeline, test coverage, pylint
+#   deploy - heroku (or alternates), also [docker & kubernetes]?
+
+# TODO: Features
+#   persist last state - all problems and current profile solved
+#   record progress - bulk import, single entries, edit entries
 
 
 def _get_all_problems() -> pd.DataFrame:
@@ -24,7 +28,7 @@ def _get_solved_problems() -> typing.Iterable:
     return [int(x) for x in file_utils.read_txt('0. Solved.txt').split('\n')]
 
 
-def _generate_tables():
+def _generate_layout():
     all_problems = _get_all_problems()
     file_utils.write_sheet('1. LeetCode.xlsx', all_problems)
 
@@ -35,10 +39,7 @@ def _generate_tables():
 
     leet_path = path_utils.get_low_hanging_fruit(solved_report)
     file_utils.write_sheet('3. LeetPath.xlsx', leet_path)
-    return all_problems, leet_path
 
-
-def _generate_layout(all_problems, leet_path):
     return html.Div([
         ui_utils.generate_table(all_problems),
         ui_utils.generate_table(leet_path),
@@ -47,6 +48,5 @@ def _generate_layout(all_problems, leet_path):
 
 if __name__ == '__main__':
     app = Dash()
-    full_df, todo_df = _generate_tables()
-    app.layout = _generate_layout(full_df, todo_df)
+    app.layout = _generate_layout()
     app.run(host=socket.gethostbyname(socket.gethostname()), port=9000)
