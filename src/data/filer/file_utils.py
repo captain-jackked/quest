@@ -29,7 +29,7 @@ def use_path(fn):
 
 
 @use_path
-def write_sheet(file_name: str, /, data: typing.Union[pd.DataFrame, dict[pd.DataFrame]]):
+def write_sheet(file_name: str, /, data: typing.Union[pd.DataFrame, dict]):
     if isinstance(data, pd.DataFrame):
         data = {str(file_name).split('\\')[-1]: data}
     with pd.ExcelWriter(file_name) as writer:
@@ -38,7 +38,7 @@ def write_sheet(file_name: str, /, data: typing.Union[pd.DataFrame, dict[pd.Data
 
 
 @use_path
-def read_sheet(file_name: str, /) -> typing.Union[pd.DataFrame, dict[pd.DataFrame]]:
+def read_sheet(file_name: str, /) -> typing.Union[pd.DataFrame, dict]:
     return pd.read_excel(file_name, index_col=0)
 
 
