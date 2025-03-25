@@ -1,6 +1,8 @@
+LEETCODE = 'https://leetcode.com'
+
 INDEX = 'Index'
 TITLE = 'Title'
-TITLE_SLUG = 'TitleSlug'
+LINK = 'Link'
 PREMIUM = 'Premium'
 
 TAGS = 'Tags'
@@ -15,4 +17,4 @@ ACCEPTANCE = 'Acceptance'
 SCORE = 'Score'
 SOLVED = 'Solved'
 
-OUTPUT_COLS = [TITLE, DIFFICULTY, ACCEPTANCE, SCORE, TAGS, PREMIUM, SOLVED]
+OUTPUT_COLS = [TITLE, LINK, DIFFICULTY, ACCEPTANCE, TAGS, PREMIUM, SCORE, SOLVED]

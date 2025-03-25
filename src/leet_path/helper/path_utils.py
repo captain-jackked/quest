@@ -33,4 +33,4 @@ def get_low_hanging_fruit(report: pd.DataFrame):
     report = TableFilter(consts.SOLVED, False).apply(report)
     report = TableFilter(consts.PREMIUM, False).apply(report)
     report = TableFilter(consts.TAGS, ['NA', 'shell'], flip=True).apply(report)
-    return report.sort_values(by=[consts.SCORE])[[consts.TITLE]]
+    return report.sort_values(by=[consts.SCORE]).drop(columns=[consts.SOLVED, consts.TAGS, consts.PREMIUM])

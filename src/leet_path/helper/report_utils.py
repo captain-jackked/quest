@@ -10,8 +10,7 @@ def append_solved(problems: pd.DataFrame, solved: typing.Iterable) -> pd.DataFra
     problems[consts.SOLVED] = False
     for index in solved:
         problems.at[index, consts.SOLVED] = True
-    problems = problems[consts.OUTPUT_COLS]
-    return problems
+    return problems[consts.OUTPUT_COLS]
 
 
 def print_progress_summary(df: pd.DataFrame):
