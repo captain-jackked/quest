@@ -2,6 +2,15 @@ import pandas as pd
 from dash import dash_table
 from dash.dash_table import FormatTemplate
 
+from src.leet_path.helper import consts
+
+WIDTHS = {
+    consts.INDEX: '10%',
+    consts.TITLE: '40%',
+    consts.DIFFICULTY: '12.5%',
+    consts.ACCEPTANCE: '12.5%',
+}
+
 
 def _append_tags(existing_tags, tag_cols, new_tags):
     existing_tags = existing_tags.copy()
@@ -23,6 +32,8 @@ def generate_table(df: pd.DataFrame, md_cols=None, pct_cols=None, dec_cols=None)
     return dash_table.DataTable(
         data=df.to_dict(orient='records'),
         columns=list(all_tags.values()),
+        style_cell={'textAlign': 'center', 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
+        style_cell_conditional=[{'if': {'column_id': k}, 'width': v} for k, v in WIDTHS.items()],
         markdown_options={'link_target': '_blank'},
         page_size=10,
         # page_action='none',

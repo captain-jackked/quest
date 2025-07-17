@@ -1,6 +1,5 @@
 import os
 import sys
-import typing
 from pathlib import Path
 
 import pandas as pd
@@ -29,7 +28,7 @@ def use_path(fn):
 
 
 @use_path
-def write_sheet(file_name: str, /, data: typing.Union[pd.DataFrame, dict]):
+def write_sheet(file_name: str, /, data: pd.DataFrame | dict):
     if isinstance(data, pd.DataFrame):
         data = {str(file_name).split('\\')[-1]: data}
     with pd.ExcelWriter(file_name) as writer:
@@ -38,7 +37,7 @@ def write_sheet(file_name: str, /, data: typing.Union[pd.DataFrame, dict]):
 
 
 @use_path
-def read_sheet(file_name: str, /) -> typing.Union[pd.DataFrame, dict]:
+def read_sheet(file_name: str, /) -> pd.DataFrame | dict:
     return pd.read_excel(file_name, index_col=0)
 
 
