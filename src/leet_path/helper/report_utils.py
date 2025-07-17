@@ -21,8 +21,11 @@ def print_progress_summary(df: pd.DataFrame):
         return sum(raw[flt][consts.SCORE])
 
     solved_flt, premium_flt = df[consts.SOLVED], df[consts.PREMIUM]
-    for difficulty in [consts.EASY, consts.MEDIUM, consts.HARD]:
-        diff_flt = df[consts.DIFFICULTY] == difficulty
+
+    diff_filters = {d: df[consts.DIFFICULTY] == d for d in [consts.EASY, consts.MEDIUM, consts.HARD]}
+    diff_filters['ALL'] = df[consts.DIFFICULTY].notna()
+
+    for difficulty, diff_flt in diff_filters.items():
         print('{:>7}: {:>7}/{:<4} (Solved/Total) | Unsolved: {:>4}/{:<4} (Non-premium/Premium)'.format(
             difficulty,
             _get_count(df, diff_flt & solved_flt), _get_count(df, diff_flt),

@@ -1,2 +1,3 @@
-# noodlethon
-Solve small real-life problems by noodling with python
+# Quest
+
+The highest risk-to-reward project is yourself
