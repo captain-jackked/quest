@@ -1,3 +1,3 @@
 # Quest
 
-The highest risk-to-reward project is yourself
+The highest reward-to-risk-ratio project is yourself
