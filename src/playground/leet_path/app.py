@@ -4,9 +4,8 @@ import typing
 from dash import Dash, html
 
 from src.data.filer import file_utils
-from src.data.graphql import leet_ql
-from src.leet_path.helper import score_utils, consts, ui_utils, sheet_utils
-from src.leet_path.helper.table_filter import FilterFactory
+from src.playground.leet_path import score_utils, sheet_utils, consts, ui_utils, leet_graph_ql
+from src.playground.leet_path.table_filter import FilterFactory
 
 
 # TODO: Generic
@@ -23,7 +22,7 @@ def _get_solved_problems() -> typing.Iterable:
 
 
 def _generate_layout():
-    all_problems = leet_ql.get_all_questions()
+    all_problems = leet_graph_ql.get_all_questions()
 
     solved = _get_solved_problems()
     solved_report = all_problems.assign(**{consts.SOLVED: all_problems.index.isin(solved)})

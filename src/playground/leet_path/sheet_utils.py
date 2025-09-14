@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.leet_path.helper import consts
+from src.playground.leet_path import consts
 
 MARKDOWN = 'markdown'
 EXCEL = 'excel'

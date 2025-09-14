@@ -2,7 +2,7 @@ import pandas as pd
 from dash import dash_table
 from dash.dash_table import FormatTemplate
 
-from src.leet_path.helper import consts
+from src.playground.leet_path import consts
 
 WIDTHS = {
     consts.INDEX: '10%',
