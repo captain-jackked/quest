@@ -18,7 +18,7 @@ from src.playground.leet_path.table_filter import FilterFactory
 
 
 def _get_solved_problems() -> typing.Iterable:
-    return set(int(x) for x in file_utils.read_txt('0. Solved.txt').split('\n'))
+    return set(int(x) for x in file_utils.read_txt('leet_path-solved.txt').split('\n'))
 
 
 def _generate_layout():
@@ -40,9 +40,9 @@ def _generate_layout():
     leet_path = leet_path.sort_values(by=[consts.SCORE])
 
     export_config = {
-        '1. LeetCode.xlsx': all_problems,
-        '2. LeetReport.xlsx': solved_report,
-        '3. LeetPath.xlsx': leet_path
+        'leet_path-leetCode.xlsx': all_problems,
+        'leet_path-leetReport.xlsx': solved_report,
+        'leet_path-leetPath.xlsx': leet_path
     }
     for k, v in export_config.items():
         file_utils.write_sheet(k, sheet_utils.beautify(v, style=sheet_utils.EXCEL))

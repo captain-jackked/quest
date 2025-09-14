@@ -2,5 +2,6 @@ dash
 numpy
 openpyxl
 pandas
+pypdf
 pytest
 requests
