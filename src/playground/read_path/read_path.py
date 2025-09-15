@@ -13,6 +13,9 @@ TITLE = 'Title'
 PAGES = 'Pages'
 CHAPTERS = 'Chapters'
 
+STATE = 'State'
+MULTIPLIER = 'Multiplier'
+
 
 def _get_count_validation_msg(files) -> str | None:
     lowest, highest = (f(files.values()) for f in (min, max))
@@ -42,7 +45,7 @@ def _get_tags_and_files(trimmed_dir, child_dirs, files):
     return tags, pdf_files
 
 
-def get_books_report(start_dir: str):
+def _get_all_books(start_dir: str):
     res = []
     for curr_dir, child_dirs, files in os.walk(start_dir):
         trimmed_dir = curr_dir.replace(start_dir, '')
@@ -58,7 +61,30 @@ def get_books_report(start_dir: str):
     return pd.DataFrame(res)
 
 
+def _get_multiplier(df):
+    avg_pages_per_chapter = sum(df[PAGES]) / sum(df[CHAPTERS])
+    return df[PAGES] / (df[CHAPTERS] * avg_pages_per_chapter)
+
+
+def _get_reading_state(state_file):
+    return {k: v for k, v in [line.split('|') for line in file_utils.read_txt(state_file).split('\n')]}
+
+
+def _get_books_report(start_dir: str, state_file: str):
+    res = _get_all_books(start_dir)
+    res[MULTIPLIER] = _get_multiplier(res)
+
+    state = _get_reading_state(state_file)
+    res[STATE] = res[TITLE].map(state).fillna(0)
+    res.loc[res[STATE] == 'Done', STATE] = res[CHAPTERS]
+    res[STATE] = res[STATE].astype(int)
+
+    progress = sum(res[STATE] * res[MULTIPLIER]) / sum(res[CHAPTERS] * res[MULTIPLIER])
+    print('Reading progress: {:.2%}'.format(progress))
+    return res
+
+
 if __name__ == '__main__':
-    df = get_books_report('D:/Collection/Books/.Casual/')
-    file_utils.write_sheet('read_path-casual.xlsx', df)
+    books_report = _get_books_report('D:/Collection/Books/.Casual/', 'read_path-state.txt')
+    file_utils.write_sheet('read_path-report.xlsx', books_report)
     print()
