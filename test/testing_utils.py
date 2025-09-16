@@ -2,7 +2,7 @@ import typing
 
 import pandas as pd
 
-from src.data.filer import file_utils
+from src.common import file_utils
 
 
 def generate_random_df():  # TODO: add params (id_lim=10, col_lim=10)

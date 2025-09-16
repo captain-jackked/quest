@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 
-from src.playground.leet_path import consts
+from src.leet_path import consts
 
 
 def _get_graphql_query() -> dict:

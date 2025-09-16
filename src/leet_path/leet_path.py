@@ -3,9 +3,10 @@ import typing
 
 from dash import Dash, html
 
-from src.data.filer import file_utils
-from src.playground.leet_path import score_utils, sheet_utils, consts, ui_utils, leet_graph_ql
-from src.playground.leet_path.table_filter import FilterFactory
+from src.common import file_utils
+from src.leet_path import consts, ui_utils, leet_graph_ql
+from src.leet_path import score_utils, sheet_utils
+from src.leet_path.table_filter import FilterFactory
 
 
 # TODO: Generic

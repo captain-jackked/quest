@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from pypdf import PdfReader
 
-from src.data.filer import file_utils
+from src.common import file_utils
 
 PDF = '.pdf'
 SPLIT_THRESHOLD = 50

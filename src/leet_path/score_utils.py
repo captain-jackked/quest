@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from src.playground.leet_path import consts
+from src.leet_path import consts
 
 MODIFIED_ACC = 'Modified Acceptance'
 BASE_SCORES = {consts.EASY: 1.0, consts.MEDIUM: 2.0, consts.HARD: 3.0}
