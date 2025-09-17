@@ -1,19 +1,18 @@
 import os
-import sys
 from pathlib import Path
 
 import pandas as pd
+
+from src.common import collection_utils, project_config
 
 DEFAULT_FILER = 'dump/'
 
 
 def use_path(fn):
     def _get_project_dir():
-        syspath = sys.path
-        for x in syspath[1:]:
-            if x in syspath[0]:
-                return x
-        return syspath[0]
+        file_path_components = str(Path(__file__)).split('\\')
+        project_name_position = collection_utils.find_last_occurrence(file_path_components, project_config.PROJECT_NAME)
+        return '/'.join(file_path_components[:1 + project_name_position])
 
     def _generate_path(file_name: str):
         location = Path(os.path.join(_get_project_dir(), DEFAULT_FILER))
