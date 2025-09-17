@@ -37,6 +37,7 @@ def print_progress_summary(df: pd.DataFrame):
     diff_filters = {d: df[consts.DIFFICULTY] == d for d in [consts.EASY, consts.MEDIUM, consts.HARD]}
     diff_filters['ALL'] = df[consts.DIFFICULTY].notna()
 
+    print()
     for difficulty, diff_flt in diff_filters.items():
         print('{:>7}: {:>7}/{:<4} (Solved/Total) | Unsolved: {:>4}/{:<4} (Non-premium/Premium)'.format(
             difficulty,

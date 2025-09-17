@@ -6,7 +6,7 @@ from pypdf import PdfReader
 from src.common import file_utils
 
 PDF = '.pdf'
-SPLIT_THRESHOLD = 50
+SPLIT_THRESHOLD = 40
 
 CONTEXT = 'Context'
 TITLE = 'Title'
@@ -20,11 +20,11 @@ MULTIPLIER = 'Multiplier'
 def _get_count_validation_msg(files) -> str | None:
     lowest, highest = (f(files.values()) for f in (min, max))
     if len(files) == 1:
-        return 'No chapters found'
+        return 'Not split yet'
     elif lowest > SPLIT_THRESHOLD:
-        return 'Split full directory'
-    # elif lowest * 10 < highest:
-    #     return 'Rethink parity'
+        return 'More splits needed'
+    elif lowest * 10 < highest:
+        return 'Rethink parity'
     return None
 
 
@@ -32,7 +32,11 @@ def _get_page_counts(tags, pdf_files: list[str], curr_dir: str):
     page_counts = {f: len(PdfReader(os.path.join(curr_dir, f)).pages) for f in pdf_files}
     page_note = _get_count_validation_msg(page_counts)
     if page_note:
-        print(f'{page_note} | {tags} | {page_counts}')
+        print('Note: {:>25} | {:>70} | {}'.format(
+            page_note,
+            ', '.join(tags),
+            ', '.join(page_counts.keys())
+        ))
     return page_counts
 
 
@@ -47,6 +51,7 @@ def _get_tags_and_files(trimmed_dir, child_dirs, files):
 
 def _get_all_books(start_dir: str):
     res = []
+    print()
     for curr_dir, child_dirs, files in os.walk(start_dir):
         trimmed_dir = curr_dir.replace(start_dir, '')
         tags, pdf_files = _get_tags_and_files(trimmed_dir, child_dirs, files)
@@ -58,6 +63,7 @@ def _get_all_books(start_dir: str):
                 CHAPTERS: len(page_counts.values()),
                 PAGES: sum(page_counts.values()),
             })
+    print()
     return pd.DataFrame(res)
 
 
@@ -67,7 +73,10 @@ def _get_multiplier(df):
 
 
 def _get_reading_state(state_file):
-    return {k: v for k, v in [line.split('|') for line in file_utils.read_txt(state_file).split('\n')]}
+    res = file_utils.read_txt(state_file).split('\n')
+    res = [x.split('|') for x in res if len(x) > 0]  # Disregard empty lines, split by pipe
+    res = [[x[0], 'Done'] if len(x) == 1 else x for x in res]
+    return {k: v for k, v in res}
 
 
 def _get_books_report(start_dir: str, state_file: str):
