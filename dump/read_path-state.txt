@@ -27,6 +27,6 @@ Head First Design Patterns
 Don't Believe Everything You Think|7
 Men Are from Mars, Women Are from Venus|5
 1. Sapiens|4
-2 Deep Work|4
+2 Deep Work|5
 The White Tiger|2
 Algorithms Unlocked|10

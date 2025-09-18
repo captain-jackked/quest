@@ -15,6 +15,8 @@ CHAPTERS = 'Chapters'
 
 STATE = 'State'
 MULTIPLIER = 'Multiplier'
+TOTAL_WORK = 'Total Work'
+WORK_DONE = 'Work Done'
 
 
 def _get_count_validation_msg(files) -> str | None:
@@ -87,6 +89,9 @@ def _get_books_report(start_dir: str, state_file: str):
     res[STATE] = res[TITLE].map(state).fillna(0)
     res.loc[res[STATE] == 'Done', STATE] = res[CHAPTERS]
     res[STATE] = res[STATE].astype(int)
+
+    res[TOTAL_WORK] = res[CHAPTERS] * res[MULTIPLIER]
+    res[WORK_DONE] = res[STATE] * res[MULTIPLIER]
 
     progress = sum(res[STATE] * res[MULTIPLIER]) / sum(res[CHAPTERS] * res[MULTIPLIER])
     print('Reading progress: {:.2%}'.format(progress))
