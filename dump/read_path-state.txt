@@ -7,6 +7,7 @@ I'm OK, You're OK
 The Mystery Method
 The Subtle Art of Not Giving a Fuck
 Thinking, Fast and Slow
+2 Deep Work
 
 Starting Strength
 Strong Enough
@@ -24,9 +25,7 @@ Head First Design Patterns
 3 Clean Agile
 
 1. The 48 Laws of Power|38
-Don't Believe Everything You Think|7
 Men Are from Mars, Women Are from Venus|5
 1. Sapiens|4
-2 Deep Work|5
 The White Tiger|2
 Algorithms Unlocked|10
